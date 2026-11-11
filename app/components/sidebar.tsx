@@ -41,6 +41,8 @@ interface SidebarProps {
   currentUser: CurrentUser | null;
   recentCourses?: RecentCourse[];
   isTeamAdmin?: boolean;
+  /** PROTOTYPE: extra control rendered in the user row, before Settings. */
+  userRowExtra?: React.ReactNode;
 }
 
 interface NavItem {
@@ -117,6 +119,7 @@ export function Sidebar({
   currentUser,
   recentCourses = [],
   isTeamAdmin = false,
+  userRowExtra,
 }: SidebarProps) {
   const currentUserRole = currentUser?.role ?? null;
   const [isDark, setIsDark] = useState(false);
@@ -242,6 +245,7 @@ export function Sidebar({
                 {currentUser.role}
               </div>
             </div>
+            {userRowExtra}
             <NavLink
               to="/settings"
               title="Settings"

@@ -1,7 +1,20 @@
-import { Outlet } from "react-router";
+import { Outlet, useSearchParams } from "react-router";
+import { useEffect, useState } from "react";
 import type { Route } from "./+types/layout.app";
-import { Sidebar } from "~/components/sidebar";
 import { DevUI } from "~/components/dev-ui";
+// PROTOTYPE: bell variants, switchable via `?variant=`. See app/components/prototype-bell.
+import { BellStoreProvider } from "~/components/prototype-bell/store";
+import {
+  PrototypeSwitcher,
+  VARIANT_STORAGE_KEY,
+} from "~/components/prototype-bell/switcher";
+import {
+  VariantA,
+  VariantB,
+  VariantC,
+  variantNames,
+  type VariantKey,
+} from "~/components/prototype-bell/variants";
 import { Toaster } from "sonner";
 import { getCurrentUserId, getDevCountry } from "~/lib/session";
 import { getCountryTierInfo, COUNTRIES } from "~/lib/ppp";
@@ -227,16 +240,32 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
     isTeamAdmin: userIsTeamAdmin,
   } = loaderData;
 
+  // PROTOTYPE: the URL param wins; otherwise the last choice from this tab, so
+  // in-app navigation (which drops the param) keeps the variant.
+  const [searchParams] = useSearchParams();
+  const paramVariant = searchParams.get("variant");
+  const [stored, setStored] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      setStored(sessionStorage.getItem(VARIANT_STORAGE_KEY));
+    } catch {}
+  }, [paramVariant]);
+  const candidate = paramVariant ?? stored ?? "A";
+  const variant: VariantKey = candidate in variantNames ? (candidate as VariantKey) : "A";
+  const Chrome = { A: VariantA, B: VariantB, C: VariantC }[variant];
+  const sidebarProps = {
+    currentUser,
+    recentCourses,
+    isTeamAdmin: userIsTeamAdmin,
+  };
+
   return (
+    <BellStoreProvider>
     <div className="flex h-screen overflow-hidden">
-      <Sidebar
-        currentUser={currentUser}
-        recentCourses={recentCourses}
-        isTeamAdmin={userIsTeamAdmin}
-      />
-      <main className="flex-1 overflow-y-auto">
+      <Chrome sidebar={sidebarProps}>
         <Outlet />
-      </main>
+      </Chrome>
+      <PrototypeSwitcher variants={variantNames} current={variant} />
       <DevUI
         users={users}
         currentUser={currentUser}
@@ -246,5 +275,6 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
       />
       <Toaster position="bottom-right" richColors closeButton />
     </div>
+    </BellStoreProvider>
   );
 }
