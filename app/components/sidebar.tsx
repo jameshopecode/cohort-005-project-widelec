@@ -43,6 +43,8 @@ interface SidebarProps {
   isTeamAdmin?: boolean;
   /** PROTOTYPE: extra control rendered in the user row, before Settings. */
   userRowExtra?: React.ReactNode;
+  /** PROTOTYPE: controls on their own line under the avatar (chosen in ticket #4). */
+  stackedUserRow?: boolean;
 }
 
 interface NavItem {
@@ -120,6 +122,7 @@ export function Sidebar({
   recentCourses = [],
   isTeamAdmin = false,
   userRowExtra,
+  stackedUserRow = false,
 }: SidebarProps) {
   const currentUserRole = currentUser?.role ?? null;
   const [isDark, setIsDark] = useState(false);
@@ -232,36 +235,50 @@ export function Sidebar({
         </button>
 
         {currentUser && (
-          <div className="flex items-center gap-3 rounded-md px-3 py-2">
-            <UserAvatar
-              name={currentUser.name}
-              avatarUrl={currentUser.avatarUrl}
-            />
-            <div className="flex-1 min-w-0">
-              <div className="truncate text-sm font-medium">
-                {currentUser.name}
-              </div>
-              <div className="truncate text-xs capitalize text-sidebar-foreground/50">
-                {currentUser.role}
+          <div
+            className={cn(
+              "rounded-md px-3 py-2",
+              stackedUserRow ? "space-y-2" : "flex items-center gap-3"
+            )}
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <UserAvatar
+                name={currentUser.name}
+                avatarUrl={currentUser.avatarUrl}
+              />
+              <div className="flex-1 min-w-0">
+                <div className="truncate text-sm font-medium">
+                  {currentUser.name}
+                </div>
+                <div className="truncate text-xs capitalize text-sidebar-foreground/50">
+                  {currentUser.role}
+                </div>
               </div>
             </div>
-            {userRowExtra}
-            <NavLink
-              to="/settings"
-              title="Settings"
-              className="rounded-md p-1 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            <div
+              className={cn(
+                "flex items-center",
+                stackedUserRow ? "justify-end gap-1" : "gap-0"
+              )}
             >
-              <Settings className="size-4" />
-            </NavLink>
-            <Form method="post" action="/api/logout">
-              <button
-                type="submit"
-                title="Sign out"
+              {userRowExtra}
+              <NavLink
+                to="/settings"
+                title="Settings"
                 className="rounded-md p-1 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               >
-                <LogOut className="size-4" />
-              </button>
-            </Form>
+                <Settings className="size-4" />
+              </NavLink>
+              <Form method="post" action="/api/logout">
+                <button
+                  type="submit"
+                  title="Sign out"
+                  className="rounded-md p-1 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                >
+                  <LogOut className="size-4" />
+                </button>
+              </Form>
+            </div>
           </div>
         )}
       </div>

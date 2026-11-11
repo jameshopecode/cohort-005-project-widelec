@@ -20,7 +20,7 @@ interface ChromeProps {
 }
 
 export const variantNames = {
-  A: "Sidebar bell + popover",
+  A: "Sidebar bell + popover (chosen)",
   B: "Sidebar bell → page",
   C: "Top bar bell + popover",
 } as const;
@@ -32,6 +32,7 @@ export function VariantA({ sidebar, children }: ChromeProps) {
     <>
       <Sidebar
         {...sidebar}
+        stackedUserRow
         userRowExtra={<BellPopover side="right" tone="sidebar" />}
       />
       <main className="flex-1 overflow-y-auto">{children}</main>
