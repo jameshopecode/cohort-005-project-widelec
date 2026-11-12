@@ -116,12 +116,9 @@ _Avoid_: Inbox, Activity feed
 ### Bookmarks and Notes
 
 **Bookmark**:
-A Student's flag on a Lesson, so they can find it again. One per Student per
-Lesson, and the Student is the only one who sees it.
-_Avoid_: Favourite, star, saved item
+A Student's flag on a Lesson, so they can find it again. One per Student per Lesson, with no title and no ordering the Student controls.
+_Avoid_: Favourite, Star
 
 **Note**:
-A Student's own writing about a Lesson, private to the Student who wrote it.
-One per Student per Lesson. A Note is not a Comment — a Comment is addressed
-to other people, a Note is addressed to nobody.
-_Avoid_: Annotation, scratchpad, memo
+A Student's own plain-text writing about a Lesson, private to the Student who wrote it. One per Student per Lesson; a Note is addressed to nobody, where a Comment is addressed to other people.
+_Avoid_: Annotation, Memo, Scratchpad

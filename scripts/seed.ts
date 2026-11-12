@@ -2003,6 +2003,41 @@ This course is still in draft while the cluster examples are rewritten against t
     `Created ${countRows(schema.comments)} lesson comments across ${countRows(schema.comments, isNull(schema.comments.parentId))} threads.`
   );
 
+  // ─── Bookmarks and Notes ───
+  // Emma's own flags and plain-text notes on course 1, so the Saved page and
+  // the lesson page have something to show. Nobody else can see them.
+
+  db.insert(schema.bookmarks)
+    .values([
+      { userId: students[0].id, lessonId: course1LessonIds[7], createdAt: daysAgo(9) },
+      { userId: students[0].id, lessonId: course1LessonIds[2], createdAt: daysAgo(20) },
+      { userId: students[1].id, lessonId: course1LessonIds[0], createdAt: daysAgo(30) },
+    ])
+    .run();
+
+  db.insert(schema.notes)
+    .values([
+      {
+        userId: students[0].id,
+        lessonId: course1LessonIds[7],
+        body: "Generics: the <T> is a placeholder the caller fills in.\n\nRe-watch from 04:10 — the constraint syntax (T extends ...) went past me the first time.",
+        createdAt: daysAgo(9),
+        updatedAt: daysAgo(2),
+      },
+      {
+        userId: students[0].id,
+        lessonId: course1LessonIds[2],
+        body: "tsc --init writes the tsconfig. Keep `strict: true` on.",
+        createdAt: daysAgo(20),
+        updatedAt: daysAgo(20),
+      },
+    ])
+    .run();
+
+  console.log(
+    `Created ${countRows(schema.bookmarks)} bookmarks and ${countRows(schema.notes)} notes.`
+  );
+
   // ─── Lesson Progress ───
 
   // Helper to mark lessons as complete
