@@ -300,6 +300,36 @@ describe("approving a Refund Request", () => {
     });
   });
 
+  it("keeps the buyer's Bookmarks and Notes", async () => {
+    const purchase = buyForSelf(base.user.id);
+    db.insert(schema.bookmarks)
+      .values({ userId: base.user.id, lessonId: lessonIds[0] })
+      .run();
+    db.insert(schema.notes)
+      .values({ userId: base.user.id, lessonId: lessonIds[1], body: "Keep me" })
+      .run();
+    const id = await raise(purchase.id, base.user.id);
+
+    const result = await approveRefundRequest(db, id, platformAdmin.id, null, NOW, notifications);
+
+    expect(result.ok).toBe(true);
+    expect(isEnrolled(base.user.id)).toBe(false);
+    expect(
+      db
+        .select()
+        .from(schema.bookmarks)
+        .where(eq(schema.bookmarks.userId, base.user.id))
+        .all()
+    ).toHaveLength(1);
+    expect(
+      db
+        .select()
+        .from(schema.notes)
+        .where(eq(schema.notes.userId, base.user.id))
+        .all()
+    ).toMatchObject([{ lessonId: lessonIds[1], body: "Keep me" }]);
+  });
+
   it("keeps the buyer's Enrollment if they also hold a Claimed Seat for the course", async () => {
     const priya = addStudent("Priya");
     const { seats } = buySeats(priya.id, 2);
