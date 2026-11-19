@@ -37,7 +37,7 @@ export function FeedbackButton() {
   }, [issueUrl]);
 
   return (
-    <div className="border-t border-dashed px-3 py-2">
+    <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button
@@ -70,7 +70,7 @@ export function FeedbackButton() {
           Issue filed: {issueUrl}
         </a>
       )}
-    </div>
+    </>
   );
 }
 

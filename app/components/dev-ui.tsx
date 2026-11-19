@@ -190,7 +190,11 @@ export function DevUI({
       </div>
 
       {/* Files issues with your own gh login, so it never ships. */}
-      {import.meta.env.DEV && <FeedbackButton />}
+      {import.meta.env.DEV && (
+        <footer className="border-t border-dashed px-3 py-2">
+          <FeedbackButton />
+        </footer>
+      )}
     </div>
   );
 }

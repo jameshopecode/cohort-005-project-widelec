@@ -22,14 +22,16 @@ function renderPanel() {
 }
 
 describe("DevUI panel", () => {
-  it("puts Send feedback in a footer strip after the panel body, not in a section of its own", () => {
+  // vitest runs with import.meta.env.DEV true, so the dev-only button renders.
+  it("puts Send feedback in the panel's footer, after the panel body", () => {
     const markup = renderPanel();
-    const afterCountry = markup.slice(markup.indexOf("PPP Country"));
-    const footerStart = afterCountry.indexOf(
-      '<div class="border-t border-dashed px-3 py-2">'
-    );
+    const footer = markup.match(/<footer[^>]*>([\s\S]*?)<\/footer>/);
 
-    expect(footerStart).toBeGreaterThan(-1);
-    expect(afterCountry.indexOf("Send feedback")).toBeGreaterThan(footerStart);
+    expect(footer?.[1] ?? "no <footer> in the panel").toContain(
+      "Send feedback"
+    );
+    expect(markup.indexOf("<footer")).toBeGreaterThan(
+      markup.indexOf("PPP Country")
+    );
   });
 });
