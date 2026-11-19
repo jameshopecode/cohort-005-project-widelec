@@ -37,13 +37,13 @@ export function FeedbackButton() {
   }, [issueUrl]);
 
   return (
-    <div className="mt-3 border-t border-dashed pt-3">
+    <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button
-            size="sm"
-            variant="outline"
-            className="w-full justify-between"
+            size="xs"
+            variant="ghost"
+            className="w-full justify-between text-muted-foreground"
           >
             Send feedback
             <MessageSquarePlus className="size-3" />
@@ -65,12 +65,12 @@ export function FeedbackButton() {
           href={issueUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-1.5 block truncate text-xs underline"
+          className="mt-1 block truncate px-1.5 text-xs underline"
         >
           Issue filed: {issueUrl}
         </a>
       )}
-    </div>
+    </>
   );
 }
 
