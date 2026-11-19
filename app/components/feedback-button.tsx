@@ -65,7 +65,7 @@ export function FeedbackButton() {
           href={issueUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-1 block truncate px-2 text-xs underline"
+          className="mt-1 block truncate px-1.5 text-xs underline"
         >
           Issue filed: {issueUrl}
         </a>
