@@ -37,13 +37,13 @@ export function FeedbackButton() {
   }, [issueUrl]);
 
   return (
-    <div className="mt-3 border-t border-dashed pt-3">
+    <div className="border-t border-dashed px-3 py-2">
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button
-            size="sm"
-            variant="outline"
-            className="w-full justify-between"
+            size="xs"
+            variant="ghost"
+            className="w-full justify-between text-muted-foreground"
           >
             Send feedback
             <MessageSquarePlus className="size-3" />
@@ -65,7 +65,7 @@ export function FeedbackButton() {
           href={issueUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-1.5 block truncate text-xs underline"
+          className="mt-1 block truncate px-2 text-xs underline"
         >
           Issue filed: {issueUrl}
         </a>

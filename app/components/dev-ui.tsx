@@ -187,10 +187,10 @@ export function DevUI({
             </div>
           )}
         </div>
-
-        {/* Files issues with your own gh login, so it never ships. */}
-        {import.meta.env.DEV && <FeedbackButton />}
       </div>
+
+      {/* Files issues with your own gh login, so it never ships. */}
+      {import.meta.env.DEV && <FeedbackButton />}
     </div>
   );
 }
