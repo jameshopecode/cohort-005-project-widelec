@@ -8,10 +8,8 @@ export {
   getLessonById,
   getModuleById,
   getUserById,
-  getCourseForLesson,
   flattenCourseLessons,
 } from "./lib/course";
-export type { FlatLesson } from "./lib/course";
 export {
   getLessonProgress,
   getLessonProgressForCourse,
@@ -21,12 +19,11 @@ export {
   calculateWatchProgress,
 } from "./lib/progress";
 export { getCommentById, getLessonThread, renderThread } from "./lib/thread";
-export type { CommentAuthor, ThreadComment } from "./lib/thread";
+export type { ThreadComment } from "./lib/thread";
 export {
   getQuizByLessonId,
+  getQuizInLesson,
   getQuizWithQuestions,
   getBestAttempt,
-  calculateGrade,
   computeResult,
 } from "./lib/quiz";
-export type { QuestionResult } from "./lib/quiz";
