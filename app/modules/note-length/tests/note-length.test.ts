@@ -41,6 +41,12 @@ describe("noteLengthStatus", () => {
     });
   });
 
+  it("ignores leading and trailing whitespace, which the save trims", () => {
+    const status = noteLengthStatus(`  ${"x".repeat(MAX_NOTE_LENGTH)}\n\n`);
+    expect(status.label).toBe("2,000 / 2,000");
+    expect(status.isOverLimit).toBe(false);
+  });
+
   it("counts an emoji as two, the way the save limit does", () => {
     expect(noteLengthStatus("👍").label).toBe("2 / 2,000");
   });

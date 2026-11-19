@@ -22,10 +22,10 @@ function toneFor(length: number): NoteLengthTone {
   return "normal";
 }
 
-// `string.length` counts UTF-16 code units, which is what the save schema's
-// `.max()` counts too, so the counter and the server agree on the limit.
+// The save schema trims, then `.max()` counts UTF-16 code units; doing the
+// same here keeps the counter and the server agreeing on the limit.
 export function computeNoteLengthStatus(body: string): NoteLengthStatus {
-  const length = body.length;
+  const length = body.trim().length;
   const tone = toneFor(length);
   return {
     label: `${formatCount(length)} / ${formatCount(MAX_NOTE_LENGTH)}`,
