@@ -95,6 +95,63 @@ module.exports = {
       to: { path: ["^app/db/", "^node_modules/(drizzle-orm|better-sqlite3)/"] },
     },
     {
+      name: "routes-no-db",
+      comment:
+        'A route asks a module for its data and does not query the database itself (CODING_STANDARDS.md, "A route does not query data a module owns"). Importing ~/db/schema for an enum or a type is fine. The routes below predate the rule: remove each once its queries live in a module.',
+      severity: "error",
+      from: {
+        path: "^app/routes/",
+        pathNot: [
+          "admin.categories",
+          "admin.courses",
+          "admin.refunds",
+          "admin.users",
+          "api.video-tracking",
+          "courses.$slug.$moduleId",
+          "courses.$slug.lessons.$lessonId",
+          "courses.$slug.purchase",
+          "courses.$slug.refund",
+          "courses.$slug",
+          "courses.$slug.welcome",
+          "courses",
+          "dashboard",
+          "home",
+          "instructor.$courseId.lessons.$lessonId.quiz",
+          "instructor.$courseId.lessons.$lessonId",
+          "instructor.$courseId.modules.$moduleId",
+          "instructor.$courseId.students",
+          "instructor.$courseId",
+          "instructor.new",
+          "instructor.questions",
+          "instructor",
+          "layout.app",
+          "login",
+          "redeem.$code",
+          "saved",
+          "settings",
+          "signup",
+          "team",
+        ].map(
+          (route) =>
+            `^app/routes/${route.replaceAll(".", "\\.").replaceAll("$", "\\$")}\\.tsx?$`
+        ),
+      },
+      to: {
+        path: [
+          "^app/db/index\\.ts$",
+          "^node_modules/(drizzle-orm|better-sqlite3)/",
+        ],
+      },
+    },
+    {
+      name: "module-lib-takes-db",
+      comment:
+        "A module's lib/ takes the database as a parameter, and only its entry point binds the app database, as instructor-analytics does with createInstructorAnalytics(database). A lib/ that imports ~/db cannot be tested against a test database.",
+      severity: "error",
+      from: { path: `^${R}/[^/]+/lib/` },
+      to: { path: "^app/db/index\\.ts$" },
+    },
+    {
       name: "components-no-db-connection",
       comment:
         "Components ship to the browser, so they may not open the database connection: it pulls better-sqlite3 into the client bundle and breaks hydration. Get data through a loader instead.",

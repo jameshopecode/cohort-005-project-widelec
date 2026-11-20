@@ -1,6 +1,6 @@
 ---
 name: mutation-testing
-description: Reading a Stryker mutation report from JSON — list the surviving mutants and locate each one in the source. Use after `npm run test:mutation`, or when asked which mutants survived.
+description: Reading a Stryker mutation report from JSON, not the terminal output — list the surviving mutants and locate each one in the source. Use when running `npm run test:mutation`, or when asked which mutants survived.
 ---
 
 # Reading a mutation report

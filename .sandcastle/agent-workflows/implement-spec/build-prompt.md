@@ -15,6 +15,9 @@ Read CODING_STANDARDS.md.
 - The review workflow checks you against the ticket's "Done when". Reread it
   before you stop.
 - `npm run build` must pass too.
+- The pre-commit hook rejects any touched file over 5000 tokens (20 KB). Check
+  the size of a file before you edit it. If it is over, split it first, in a
+  commit of its own that only moves code.
 - Commit with `git commit` on the current branch. When the pre-commit hook
   rejects a commit, fix the work and commit again. The hook stays as it is:
   no `--no-verify`, no edits to `.husky/`, `scripts/pre-commit.sh` or

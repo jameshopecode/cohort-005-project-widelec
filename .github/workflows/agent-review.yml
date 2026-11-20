@@ -28,8 +28,12 @@ name: Agent — Review A Pull Request
 #
 # IT FIXES WHAT IT CAN
 #   A review that only lists findings hands the work to a human. This one
-#   fixes every finding it can, as commits on the PR's branch, and leaves the
-#   rest as inline comments on their file and line. The workflow pushes the
+#   fixes every finding that does not need a human, deepening the PR's
+#   modules included, as commits on the PR's branch. Only decisions (product
+#   questions, one-way doors, what no check can confirm) become inline
+#   comments on their file and line. The verdict lists what was fixed and
+#   does not repeat the comments. It also starts from `npm run check` and
+#   `npm run build`, run on the PR before the agent. The workflow pushes the
 #   commits, never forced. If someone pushed to the branch during the run,
 #   GitHub rejects the push, and the commits go to a new branch,
 #   `<pr branch>-<run id>`, opened as a draft PR against the same base. The
@@ -87,7 +91,9 @@ jobs:
   review:
     if: github.event.label.name == 'agent:review'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # The review fixes rather than reports, deepening modules included, so it
+    # gets as long as the implementer.
+    timeout-minutes: 45
 
     env:
       GH_REPO: ${{ github.repository }}
@@ -116,7 +122,7 @@ jobs:
           gh pr edit "$PR_NUMBER" --add-label "agent:in-progress"
 
       - name: Checkout the pull request
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # The PR's head, so the review's fixes are commits on top of it.
           # Full history: the review diffs it against the base.
@@ -152,7 +158,7 @@ jobs:
           cat /tmp/review-spec.md
 
       - name: Setup Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "22"
           cache: npm
@@ -160,8 +166,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Claude Code
-        run: npm install -g @anthropic-ai/claude-code
+      - name: Install Claude Code and agent-browser
+        # Pinned, so a run is not changed by a release nobody looked at.
+        # agent-browser is installed here, not by the agent mid-run.
+        run: |
+          npm install -g @anthropic-ai/claude-code@2.1.329 agent-browser@0.43.0
+          agent-browser install
 
       - name: Migrate and seed the database
         # The pre-commit hook runs on every commit the agent makes, and the
@@ -169,6 +179,29 @@ jobs:
         run: |
           npm run db:migrate
           npm run db:seed
+
+      - name: Run the checks
+        # Nothing else runs the tests or the build on a pull request: the
+        # pre-commit hook runs neither. The agent starts from this result
+        # instead of running the checks to find out, and a failure is its
+        # first finding, not a failed run.
+        run: |
+          check() {
+            echo "## npm run $1"
+            echo ""
+            if npm run "$1" > "/tmp/review-$1.log" 2>&1; then
+              echo "Passed."
+            else
+              echo "**Failed.** The last lines:"
+              echo ""
+              echo '```'
+              tail -n 60 "/tmp/review-$1.log"
+              echo '```'
+            fi
+            echo ""
+          }
+          { check check; check build; } > /tmp/review-checks.md
+          cat /tmp/review-checks.md
 
       - name: Open the branch
         run: |

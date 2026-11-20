@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript", "react", "jsx-a11y", "import", "vitest"],
-  "jsPlugins": ["./lint-rules/sql-raw.js"],
+  "jsPlugins": ["./lint-rules/sql-raw.js", "./lint-rules/standards.js"],
   "categories": {
     "correctness": "error"
   },
@@ -19,6 +19,9 @@
     "typescript/no-non-null-assertion": "error",
     "typescript/no-inferrable-types": "error",
     "typescript/consistent-type-definitions": ["error", "type"],
+    // `import { type A }` keeps a runtime import, which pulls a .server
+    // module into the client build.
+    "typescript/no-import-type-side-effects": "error",
     "eqeqeq": [
       "error",
       "always",
@@ -86,7 +89,8 @@
     "import/no-default-export": "error",
     "vitest/no-disabled-tests": "error",
     "vitest/no-focused-tests": "error",
-    "sql/no-dynamic-raw": "error"
+    "sql/no-dynamic-raw": "error",
+    "standards/no-number-of-input": "error"
   },
   "overrides": [
     {
@@ -103,9 +107,16 @@
       }
     },
     {
+      "files": ["app/lib/**", "app/modules/**"],
+      "rules": {
+        "standards/inject-clock": "error"
+      }
+    },
+    {
       "files": ["**/*.test.ts", "**/*.test.tsx"],
       "rules": {
-        "max-lines-per-function": "off"
+        "max-lines-per-function": "off",
+        "standards/inject-clock": "off"
       }
     },
     {
@@ -238,6 +249,25 @@
       ],
       "rules": {
         "max-depth": "off"
+      }
+    },
+    // Read the clock or Number() request input. Remove each entry once fixed.
+    {
+      "files": ["app/lib/mailer.server.ts", "app/lib/utils.ts"],
+      "rules": {
+        "standards/inject-clock": "off"
+      }
+    },
+    {
+      "files": [
+        "app/routes/courses.$slug.$moduleId.tsx",
+        "app/routes/courses.$slug.lessons.$lessonId.tsx",
+        "app/routes/instructor.$courseId.lessons.$lessonId.quiz.tsx",
+        "app/routes/instructor.$courseId.lessons.$lessonId.tsx",
+        "app/routes/instructor.$courseId.modules.$moduleId.tsx"
+      ],
+      "rules": {
+        "standards/no-number-of-input": "off"
       }
     }
   ]

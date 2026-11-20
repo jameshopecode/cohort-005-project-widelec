@@ -100,7 +100,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           persist-credentials: false
 
@@ -149,7 +149,7 @@ jobs:
 
       - name: Setup Node.js 22
         if: steps.batch.outputs.numbers != '[]'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "22"
           cache: npm
@@ -160,7 +160,7 @@ jobs:
 
       - name: Install Claude Code
         if: steps.batch.outputs.numbers != '[]'
-        run: npm install -g @anthropic-ai/claude-code
+        run: npm install -g @anthropic-ai/claude-code@2.1.329
 
       - name: Explore
         if: steps.batch.outputs.numbers != '[]'
