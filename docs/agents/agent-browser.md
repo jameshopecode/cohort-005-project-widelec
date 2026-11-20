@@ -12,6 +12,9 @@ npm install -g agent-browser
 agent-browser install
 ```
 
+The factory workflows install it before the agent starts: `which
+agent-browser` answers there.
+
 ## Asking your own question
 
 Start the app with `npm run dev` first. The examples below use
@@ -49,8 +52,36 @@ the rest.
 **Ask the page, do not ask the person.** A change you have not looked at is a
 change you are reporting on trust.
 
+## Signing in as someone
+
+The seeded database has fixed users. Switch with a POST from the page, then
+open the page you want:
+
+```bash
+agent-browser eval "fetch('/api/switch-user',{method:'POST',body:new URLSearchParams({userId:'5'})}).then(r=>r.status)"
+```
+
+| id  | who                                                                       |
+| --- | ------------------------------------------------------------------------- |
+| 1   | Alex Rivera, admin                                                        |
+| 2   | Sarah Chen, instructor                                                    |
+| 5   | Emma Wilson, student enrolled in `building-rest-apis-with-nodejs`         |
+| 6   | James Park, student not enrolled there: the locked "Buy this course" view |
+
+## Screenshots
+
 Screenshots are PR evidence: a before and an after for a change that shows in
 the UI.
+
+- Take the before first, before you edit anything, framed the way the after
+  will be. Taking it later means stashing or checking out the old code under
+  a running dev server.
+- The DevUI panel sits over the bottom-right corner. Hide it before each
+  screenshot:
+
+  ```bash
+  agent-browser eval 'document.querySelectorAll("[data-dev-ui]").forEach(el => el.style.display = "none")'
+  ```
 
 ## Two things that will bite you
 

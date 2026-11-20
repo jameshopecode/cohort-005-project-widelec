@@ -18,7 +18,8 @@ Form data, search parameters and request bodies get a zod schema before the
 values reach any query. Parse once, at the boundary; after that the value has
 a type and you do not check it again. Coerce numbers through the schema, not
 `Number()`: `Number("")` is `0`, and an empty `lessonId` once opened lesson 0
-for every learner.
+for every learner. oxlint rejects `Number()` of `params`, `formData.get()` and
+`searchParams.get()`.
 
 ## Check permission in the action, not only the loader
 
@@ -32,9 +33,27 @@ Once a module owns a feature's data, the route asks the module for it and
 does not import `~/db` or `drizzle-orm` itself. The instructor analytics
 route gets everything from `instructorAnalytics`. A query in the loader
 splits the feature's rules across two files, and the module's tests stop
-covering what the page shows. `npm run lint:boundaries` enforces this for the
-instructor analytics route only; apply it to every other module by hand. See
-[app/modules/README.md](./app/modules/README.md).
+covering what the page shows. `npm run lint:boundaries` enforces this for
+every route not on the `routes-no-db` list of older routes in
+`.dependency-cruiser.cjs`. See [app/modules/README.md](./app/modules/README.md).
+
+## Name a module for its domain
+
+A module is named for what it knows (`notes`, `quizzes`, `lesson-progress`),
+not for the page that first needed it (`lesson-page`). A page-named module
+collects every unrelated reason the page changes.
+
+## An entry point that delegates to `lib/` is the module's shape
+
+`index.ts` calling one function in `lib/` is how a module hides its
+internals (see `app/modules/example/`). It is not a Middle Man: leave it.
+
+## A module's `lib/` takes the database as a parameter
+
+Only the entry point binds the app database; `lib/` receives it, as
+`createInstructorAnalytics(database)` does. Then a test can hand the module a
+test database. `npm run lint:boundaries` enforces this, and
+`scripts/modules-have-tests.test.ts` fails for a module with no tests.
 
 ## Arrange tests through the module under test
 
@@ -42,9 +61,19 @@ Test setup calls the module's own functions. When the function you need does
 not exist, add it to the module rather than inserting rows directly, so a
 change to how the module stores its data leaves its tests alone.
 
-## Keep files under 5000 tokens
+## A split forced by the file-size limit is its own commit
 
-Keep every file under 5000 tokens.
+The pre-commit hook rejects any touched file over 5000 tokens, so editing a
+large file can force a split. That split is in scope, not scope creep, as long
+as it lands in a commit of its own that moves code and changes no behaviour,
+before the commit with the change itself. A reader can then check the move
+with `git diff --color-moved` and read the change on its own.
+
+## A lint exemption follows moved code, never new code
+
+The per-file exemptions in `.oxlintrc.json` are debt in files that predate a
+rule. When code moves, its exemption may move with it. New code meets the
+rule, so it never gets an exemption of its own.
 
 ## Wrap related writes in a transaction
 
@@ -80,7 +109,8 @@ files and `"Pending"` in one.
 
 A function that calls `Date.now()` cannot be tested at a fixed moment. Take
 the time as an argument. The refund window tests failed every night at
-midnight until we did this.
+midnight until we did this. oxlint rejects `Date.now()` and `new Date()` in
+`app/lib/` and `app/modules/`.
 
 ## Keep secrets on the server
 

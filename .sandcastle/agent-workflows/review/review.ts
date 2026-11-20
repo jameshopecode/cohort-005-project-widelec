@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import * as fs from "node:fs";
 import * as path from "node:path";
 import * as sandcastle from "@ai-hero/sandcastle";
 import { noSandbox } from "@ai-hero/sandcastle/sandboxes/no-sandbox";
@@ -10,6 +11,8 @@ import { diffLines } from "./diff-lines";
 import { reviewSchema } from "./review-schema";
 
 const BASE_REF = required("BASE_REF");
+// Written by the agent, posted by the workflow.
+const VERDICT = "/tmp/review-verdict.md";
 
 // The agent fixes and commits, writes the verdict file, and hands back the
 // findings it left. The workflow pushes the commits, posts the verdict and
@@ -35,16 +38,29 @@ const git = (...args: string[]): string =>
 // The diff after the agent's commits: the comments land on that.
 const hunks = diffLines(git("diff", `origin/${BASE_REF}...HEAD`));
 const { comments: found }: z.infer<typeof reviewSchema> = result.output;
-const comments = found.filter(({ path: file, line }) => {
-  if (hunks.get(file)?.has(line)) return true;
-  console.error(`Dropping the comment on ${file}:${line}: not in the diff.`);
-  return false;
-});
+const inDiff = ({ path: file, line }: { path: string; line: number }) =>
+  hunks.get(file)?.has(line) ?? false;
+const comments = found.filter(inDiff);
+const outsideDiff = found.filter((comment) => !inDiff(comment));
+
+// The verdict says what was fixed; the findings for a human live only in the
+// inline comments. GitHub rejects a comment outside the diff, so those go
+// under the verdict instead of being lost.
+if (fs.existsSync(VERDICT) && found.length > 0) {
+  const lines = ["", "## For a human", ""];
+  if (comments.length > 0) {
+    lines.push(`${comments.length} inline comment(s) on their lines.`, "");
+  }
+  for (const { path: file, line, body } of outsideDiff) {
+    lines.push(`- \`${file}:${line}\` ${body.replaceAll("\n", " ")}`);
+  }
+  fs.appendFileSync(VERDICT, `${lines.join("\n")}\n`);
+}
 
 // The request body for POST /repos/{owner}/{repo}/pulls/{n}/reviews.
 writeJson("review-comments.json", {
   commit_id: git("rev-parse", "HEAD").trim(),
   event: "COMMENT",
-  body: "The findings this review left for you, on their lines. The verdict is in its own comment.",
+  body: "The decisions this review left for you, on their lines. The verdict is in its own comment.",
   comments: comments.map((comment) => ({ ...comment, side: "RIGHT" })),
 });

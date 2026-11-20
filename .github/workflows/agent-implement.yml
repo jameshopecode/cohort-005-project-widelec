@@ -115,13 +115,13 @@ jobs:
           gh issue edit "$ISSUE_NUMBER" --add-label "agent:in-progress"
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Setup Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "22"
           cache: npm
@@ -129,8 +129,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Claude Code
-        run: npm install -g @anthropic-ai/claude-code
+      - name: Install Claude Code and agent-browser
+        # Pinned, so a run is not changed by a release nobody looked at.
+        # agent-browser is installed here, not by the agent mid-run.
+        run: |
+          npm install -g @anthropic-ai/claude-code@2.1.329 agent-browser@0.43.0
+          agent-browser install
 
       - name: Migrate and seed the database
         # The agent gets a real database, because half of this repo's checks

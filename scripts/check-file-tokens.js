@@ -17,9 +17,13 @@ const IGNORED = [
 
 const isBinary = (contents) => contents.subarray(0, 8000).includes(0);
 
+// Forward slashes on both sides: on Windows lint-staged passes C:/… while
+// process.cwd() is C:\…, and the IGNORED patterns would never match.
+const root = `${process.cwd().replaceAll("\\", "/")}/`;
+
 const oversized = process.argv
   .slice(2)
-  .map((file) => file.replaceAll("\\", "/").replace(`${process.cwd()}/`, ""))
+  .map((file) => file.replaceAll("\\", "/").replace(root, ""))
   .filter((file) => !IGNORED.some((pattern) => pattern.test(file)))
   .map((file) => ({ file, contents: readFileSync(file) }))
   .filter(({ contents }) => !isBinary(contents))
@@ -52,6 +56,10 @@ How to split:
   into a fixtures file in the same tests/ folder.
 - Scripts and seed data: move large data literals into their own files and
   import them.
+
+Commit the split on its own first: code moved, no behaviour changed. Then
+commit your change on top of it. A reviewer checks the move with
+\`git diff --color-moved\` and reads your change by itself.
 
 When you are done, run \`npm run check\` and commit again.`);
   process.exit(1);
