@@ -71,17 +71,17 @@ Fałszywy klucz AWS z canarytokens w `.env` w repo i w Environment `factory-agen
 
 ### Limity jobów
 
-| Job                | Runner          | `timeout-minutes`         | `--max-turns` |
-| ------------------ | --------------- | ------------------------- | ------------- |
-| agent: explore     | `ubuntu-latest` | 30                        | 80            |
-| agent: implement   | `ubuntu-latest` | 60                        | 200           |
-| agent: review      | `ubuntu-latest` | 30                        | 150           |
-| agent: decompose   | `ubuntu-latest` | 20                        | 40            |
-| prepare / publish  | `ubuntu-slim`   | 10                        | —             |
-| CI (`ci`)          | `ubuntu-slim`   | ≤ 15                      | —             |
-| strażnik / łańcuch | `ubuntu-slim`   | 5                         | —             |
-| CI (`mutation`)    | `ubuntu-latest` | z realnego czasu (plik 4) | —             |
-| build obrazu       | `ubuntu-latest` | z realnego czasu (plik 4) | —             |
+| Job                | Runner          | `timeout-minutes`     | `--max-turns` |
+| ------------------ | --------------- | --------------------- | ------------- |
+| agent: explore     | `ubuntu-latest` | 30                    | 80            |
+| agent: implement   | `ubuntu-latest` | 60                    | 200           |
+| agent: review      | `ubuntu-latest` | 30                    | 150           |
+| agent: decompose   | `ubuntu-latest` | 20                    | 40            |
+| prepare / publish  | `ubuntu-slim`   | 10                    | —             |
+| CI (`ci`)          | `ubuntu-slim`   | ≤ 15                  | —             |
+| strażnik / łańcuch | `ubuntu-slim`   | 5                     | —             |
+| CI (`mutation`)    | `ubuntu-latest` | 30 (startowo, plik 4) | —             |
+| build obrazu       | `ubuntu-latest` | 20 (startowo, plik 4) | —             |
 
 - Przekroczenie czasu albo tur (`subtype: "error_max_turns"`) to porażka runu → `agent:blocked`; run liczy się do limitu 12.
 - `--max-budget-usd` nie jest używany (liczy stawki API, nie subskrypcję).
